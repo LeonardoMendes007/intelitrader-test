@@ -71,13 +71,10 @@ namespace ApiUser.testscases
         {
             try
             {
-                int antes = userController.getAllUsers().Value.Count;
 
-                userController.createUser(user);
+                UserReadDto persistenceUser = userController.createUser(user).Value;
 
-                int depois = userController.getAllUsers().Value.Count;
-
-                if (antes < depois)
+                if (persistenceUser.Name.Equals(user.Name) && persistenceUser.Age == user.Age)
                 {
                     return true;
                 }
@@ -92,6 +89,7 @@ namespace ApiUser.testscases
             }
 
         }
+
 
     }
 }

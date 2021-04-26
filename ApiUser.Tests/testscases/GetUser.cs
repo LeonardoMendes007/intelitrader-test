@@ -37,13 +37,15 @@ namespace ApiUser.testscases
 
             bool ver = false;
 
-            if (count > 0)
+            if (count == 3)
             {
                 ver = true;
             }
 
             Assert.True(ver);
         }
+
+        
 
 
     }

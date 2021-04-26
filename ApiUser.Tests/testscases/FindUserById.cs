@@ -45,13 +45,22 @@ namespace ApiUser.testscases
             Assert.False(findByIdUserVerification(-4));
         }
 
-          private Boolean findByIdUserVerification(int id)
+        private Boolean findByIdUserVerification(int id)
         {
 
             try
             {
                 UserReadDto user = userController.getUserById(id).Value;
-                return true;
+
+                if (user.Equals(new UserReadDto(1, "Leonardo", "Mendes", 23, DateTime.Now)))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
             }
             catch (Exception e)
             {

@@ -43,21 +43,17 @@ namespace ApiUser.testscases
 
         }
 
-        
+
 
         private Boolean deleteUserVerification(int id)
         {
             try
             {
-
-                int antes = userController.getAllUsers().Value.Count;
-
+                bool antes = GetByUserVerification(id);
                 userController.deleteUser(id);
+                bool depois = GetByUserVerification(id);
 
-                int depois = userController.getAllUsers().Value.Count;
-
-
-                if (antes > depois)
+                if (antes && !depois)
                 {
                     return true;
                 }
@@ -66,7 +62,6 @@ namespace ApiUser.testscases
                     return false;
                 }
 
-
             }
             catch (Exception e)
             {
@@ -74,6 +69,21 @@ namespace ApiUser.testscases
             }
 
 
+        }
+
+        private Boolean GetByUserVerification(int id)
+        {
+            try
+            {
+                UserReadDto antes = userController.getUserById(id).Value;
+
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+            return true;
         }
 
 

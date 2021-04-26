@@ -43,12 +43,27 @@ namespace ApiUser.testscases
         [Fact]
         public void testPutUserWithNullSurname()
         {
+            bool result;
             UserUpdateDto user = new UserUpdateDto("Leon", null, 21);
 
-            Assert.True(putUserVerification(1, user));
+            userController.updateUser(1, user);
+
+            UserReadDto persistenceUser = userController.getUserById(1).Value;
+
+            if (persistenceUser.Name.Equals(user.Name) && persistenceUser.Surname == user.Surname && persistenceUser.Age == user.Age)
+            {
+                result = true;
+            }
+            else
+            {
+                result = false;
+
+            }
+
+            Assert.True(result);
 
         }
-        
+
 
 
         private Boolean putUserVerification(int id, UserUpdateDto user)
@@ -60,7 +75,7 @@ namespace ApiUser.testscases
 
                 UserReadDto persistenceUser = userController.getUserById(id).Value;
 
-                if (persistenceUser.Name.Equals(user.Name) && persistenceUser.Surname == user.Surname && persistenceUser.Age == user.Age)
+                if (persistenceUser.Name.Equals(user.Name) && persistenceUser.Surname.Equals(user.Surname) && persistenceUser.Age == user.Age)
                 {
                     return true;
                 }

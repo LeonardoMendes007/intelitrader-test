@@ -73,9 +73,7 @@ namespace ApiUser.Controllers
 
             UserReadDto userReadDto = _mapper.Map<UserReadDto>(userModelFromRepo);
 
-            return CreatedAtRoute(nameof(getUserById), new { Id = userReadDto.Id }, userReadDto);
-
-
+            return getUserById(userModelFromRepo.Id);
 
         }
 
