@@ -20,20 +20,20 @@ namespace ApiUser.Controllers
 
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
+        private readonly ILogger _logger;
 
         public UserController(IUserService userService, IMapper mapper)
         {
             this._userService = userService;
             this._mapper = mapper;
         }
-
         [HttpGet]
         public ActionResult<List<UserReadDto>> getAllUsers()
         {
 
             List<User> users = _userService.findAll();
 
-            return _mapper.Map<List<UserReadDto>>(users);
+            return Ok(_mapper.Map<List<UserReadDto>>(users));
 
         }
 
@@ -42,11 +42,13 @@ namespace ApiUser.Controllers
         {
 
             User user = _userService.findById(id);
+
             if (user == null)
             {
-                return NotFound(CustomErrors.NotFound($"There is no resource with id = {id}", Request));
+                return NotFound();
             }
-            return _mapper.Map<UserReadDto>(user);
+            return Ok(_mapper.Map<UserReadDto>(user));
+
 
         }
 
@@ -56,24 +58,25 @@ namespace ApiUser.Controllers
 
             User userModelFromRepo = _mapper.Map<User>(userDto);
 
-            if (userDto == null)
+            if (userDto == null || userDto.Name == null || userDto.Age == 0)
             {
-                return BadRequest(CustomErrors.BadRequest($"transaction not successful", Request));
+                return BadRequest();
             }
 
-            _userService.save(userModelFromRepo);
+
 
             try
             {
+                _userService.save(userModelFromRepo);
             }
-            catch (Exception e)
+            catch
             {
-                return BadRequest(CustomErrors.InternalServerError($"A server error has occurred, if it persists, please try again later.", Request));
+                return BadRequest();
             }
 
             UserReadDto userReadDto = _mapper.Map<UserReadDto>(userModelFromRepo);
 
-            return getUserById(userModelFromRepo.Id);
+            return CreatedAtRoute(nameof(getUserById), new { Id = userReadDto.Id }, userReadDto);
 
         }
 
@@ -85,19 +88,25 @@ namespace ApiUser.Controllers
 
             if (userModelFromRepo == null)
             {
-                return NotFound(CustomErrors.NotFound($"Resource with id = {id}", Request));
+                return NotFound();
+            }
+            if (userDto == null)
+            {
+
+                return BadRequest();
             }
 
             _mapper.Map(userDto, userModelFromRepo);
 
-            _userService.update(userModelFromRepo);
+
 
             try
             {
+                _userService.update(userModelFromRepo);
             }
-            catch (Exception e)
+            catch
             {
-                return BadRequest(CustomErrors.InternalServerError($"A server error has occurred, if it persists, please try again later.", Request));
+                return BadRequest();
             }
 
             return NoContent();
@@ -111,15 +120,16 @@ namespace ApiUser.Controllers
             User userModelFromRepo = _userService.findById(id);
             if (userModelFromRepo == null)
             {
-                return BadRequest(CustomErrors.BadRequest($"Resource with id = {id}", Request));
+                return BadRequest();
             }
-            _userService.delete(userModelFromRepo);
+
             try
             {
+                _userService.delete(userModelFromRepo);
             }
-            catch (Exception e)
+            catch
             {
-                return BadRequest(CustomErrors.InternalServerError($"A server error has occurred, if it persists, please try again later.", Request));
+                return BadRequest();
             }
 
 

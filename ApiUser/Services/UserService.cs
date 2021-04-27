@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,35 +9,33 @@ namespace ApiUser.Services
 
     public class UserService : IUserService
     {
-        List<User> users = new List<User>();
 
-        public UserService()
+        private readonly ApiUserContext _context;
+
+        public UserService(ApiUserContext context)
         {
-            users.Add(new User(1, "Leonardo", "Mendes", 23, DateTime.Now));
-            users.Add(new User(2, "Ivana", "Maria", 59, DateTime.Now));
-            users.Add(new User(3, "Jéssica", "Mendes", 30, DateTime.Now));
+
+            this._context = context;
 
         }
-        public List<User> findAll()
+        public List<User> findAll()  
         {
-            return users;
+                return _context.Users.ToList();
+
         }
 
         public User findById(int id)
         {
-            return users.Find(x => x.Id == id);
+            return _context.Users.Find(id);
         }
 
         public void save(User user)
         {
-            if (user.Name != null && user.Age != 0)
-            {
-                int count = users.Last().Id;
-                user.Id = count + 1;
-                user.CreationDate = DateTime.Now;
-                users.Add(user);
-            }
 
+            user.CreationDate = DateTime.Now;
+            _context.Users.Add(user);
+
+            //retornar id ou usar para redirect
         }
 
         public void update(User user)
@@ -46,18 +43,19 @@ namespace ApiUser.Services
 
         }
 
+
         public void delete(User user)
         {
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
-            users.Remove(user);
+            _context.Users.Remove(user);
         }
 
         public bool saveChanges()
         {
-            throw new NotImplementedException();
+            return (_context.SaveChanges() >= 0);
         }
     }
 }
