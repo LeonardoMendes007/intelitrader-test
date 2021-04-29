@@ -8,7 +8,9 @@ using ApiUser.Profiles;
 using ApiUser.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 
 namespace ApiUser.tests
@@ -20,10 +22,17 @@ namespace ApiUser.tests
 
         public FindUserById()
         {
+           var mock = new Mock<ILogger<UserController>>();
+            ILogger<UserController> logger = mock.Object;
+
+            //or use this short equivalent 
+            logger = Mock.Of<ILogger<UserController>>();
+
             this._userService = new UserServiceFake();
-            this._userController = new UserController(_userService, new MapperConfiguration(c => c.AddProfile<ApiUserProfile>()).CreateMapper());
+            this._userController = new UserController(_userService, new MapperConfiguration(c => c.AddProfile<ApiUserProfile>()).CreateMapper(), logger);
 
         }
+
 
 
         [Fact]
@@ -33,10 +42,10 @@ namespace ApiUser.tests
             var okResult = Assert.IsType<OkObjectResult>(_userController.getUserById(1).Result);
             var user = Assert.IsType<UserReadDto>(okResult.Value);
             var expectedUser = new User(1, "Leonardo", "Mendes", 23, DateTime.Now);
-            Assert.Equal(user.Name,expectedUser.Name);
-            Assert.Equal(user.Id,expectedUser.Id);
-            Assert.Equal(user.Surname,expectedUser.Surname);
-            Assert.Equal(user.Age,expectedUser.Age);
+            Assert.Equal(user.Name, expectedUser.Name);
+            Assert.Equal(user.Id, expectedUser.Id);
+            Assert.Equal(user.Surname, expectedUser.Surname);
+            Assert.Equal(user.Age, expectedUser.Age);
 
         }
 

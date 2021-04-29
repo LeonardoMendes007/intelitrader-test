@@ -10,6 +10,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 
 namespace ApiUser.tests
@@ -21,8 +22,14 @@ namespace ApiUser.tests
 
         public deleteUser()
         {
+            var mock = new Mock<ILogger<UserController>>();
+            ILogger<UserController> logger = mock.Object;
+
+            //or use this short equivalent 
+            logger = Mock.Of<ILogger<UserController>>();
+
             this._userService = new UserServiceFake();
-            this._userController = new UserController(_userService, new MapperConfiguration(c => c.AddProfile<ApiUserProfile>()).CreateMapper());
+            this._userController = new UserController(_userService, new MapperConfiguration(c => c.AddProfile<ApiUserProfile>()).CreateMapper(), logger);
 
         }
 
@@ -36,7 +43,8 @@ namespace ApiUser.tests
         }
 
         [Fact]
-        public void deleteNonexistentUser_WithId_4_ReturnsBadRequest(){
+        public void deleteNonexistentUser_WithId_4_ReturnsBadRequest()
+        {
             Assert.IsType<BadRequestResult>(_userController.deleteUser(4));
         }
 

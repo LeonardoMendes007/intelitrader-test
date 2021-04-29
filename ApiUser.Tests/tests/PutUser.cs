@@ -9,6 +9,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 
 namespace ApiUser.tests
@@ -17,12 +18,17 @@ namespace ApiUser.tests
     {
         private readonly IUserController _userController;
         private readonly IUserService _userService;
-        private readonly ILogger _logger;
 
         public PutUser()
         {
+            var mock = new Mock<ILogger<UserController>>();
+            ILogger<UserController> logger = mock.Object;
+
+            //or use this short equivalent 
+            logger = Mock.Of<ILogger<UserController>>();
+
             this._userService = new UserServiceFake();
-            this._userController = new UserController(_userService, new MapperConfiguration(c => c.AddProfile<ApiUserProfile>()).CreateMapper());
+            this._userController = new UserController(_userService, new MapperConfiguration(c => c.AddProfile<ApiUserProfile>()).CreateMapper(), logger);
 
         }
 
@@ -52,7 +58,7 @@ namespace ApiUser.tests
             UserUpdateDto user = null;
             Assert.IsType<BadRequestResult>(_userController.updateUser(1, user));
             var afterUser = _userService.findById(1);
-            Assert.Equal(beforeUser,afterUser);
+            Assert.Equal(beforeUser, afterUser);
         }
 
         [Fact]

@@ -22,17 +22,18 @@ namespace ApiUser.Controllers
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
 
-        public UserController(IUserService userService, IMapper mapper)
+        public UserController(IUserService userService, IMapper mapper, ILogger<UserController> logger)
         {
             this._userService = userService;
             this._mapper = mapper;
+            this._logger = logger;
         }
         [HttpGet]
         public ActionResult<List<UserReadDto>> getAllUsers()
         {
 
             List<User> users = _userService.findAll();
-
+            _logger.LogInformation($"GET:{Request.Path} - 200 OK at {DateTime.Now}");
             return Ok(_mapper.Map<List<UserReadDto>>(users));
 
         }
